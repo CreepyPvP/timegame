@@ -1,1 +1,1 @@
-# Opengl project template
+# Timegame
