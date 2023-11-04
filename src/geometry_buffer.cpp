@@ -6,7 +6,6 @@
 #include <string.h>
 #include <math.h>
 
-
 unsigned int setup_gpu_buffers() {
     unsigned int arr;
     glGenVertexArrays(1, &arr);
@@ -35,6 +34,7 @@ unsigned int setup_gpu_buffers() {
 
 void GeometryBuffer::update_gpu_buffers(unsigned int buffer)
 {
+    // NOTE: when the length of the mapped buffer == 0, opengl throws an error
     if (vertex_count == 0 || index_count == 0)
         return;
 

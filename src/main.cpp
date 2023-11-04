@@ -3,6 +3,12 @@
 
 #include <stdio.h>
 
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float2.hpp>
+
 #include "defines.hpp"
 #include "shader.hpp"
 #include "geometry_buffer.hpp"
@@ -29,8 +35,8 @@ static int init_window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
-    global_window.width = 1280;
-    global_window.height = 720;
+    global_window.width = 960;
+    global_window.height = 540;
     GLFWmonitor* monitor = NULL;
     #ifndef DEBUG
     monitor = glfwGetPrimaryMonitor();
@@ -51,6 +57,18 @@ static int init_window()
     return 0;
 }
 
+static glm::mat4 setup_projection() {
+    // NOTE: The game is running at a 960x540 resolution
+    return glm::ortho(
+        -480.0f, 
+        480.0f, 
+        -270.0f, 
+        270.0f, 
+        .1f,
+        1000.0f
+    );
+}
+
 int main() 
 {
     if (init_window()) {
@@ -69,6 +87,8 @@ int main()
         return 2;
     }
 
+    glm::mat4 projection = setup_projection();
+
     unsigned int gpu_buffers = setup_gpu_buffers();
     GeometryBuffer draw_buffer;
     draw_buffer.init();
@@ -84,10 +104,18 @@ int main()
 
         draw_buffer.start_batch();
         draw_buffer.draw_rect(100, 100, 100, 100);
-        draw_buffer.end_batch();
+        Batch batch = draw_buffer.end_batch();
 
         draw_buffer.update_gpu_buffers(gpu_buffers);
         draw_buffer.reset();
+
+        GL(glUseProgram(shader.id));
+        set_mat4(shader.projection, &projection);
+        GL(glBindVertexArray(gpu_buffers));
+        GL(glDrawElements(GL_TRIANGLES, 
+                          batch.count, 
+                          GL_UNSIGNED_INT, 
+                          (void*) (batch.index * sizeof(unsigned int))));
 
         glfwSwapBuffers(global_window.handle);
         glfwPollEvents();
