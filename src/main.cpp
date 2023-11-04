@@ -35,11 +35,14 @@ static int init_window()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_SAMPLES, 4);
 
+    #ifndef DEBUG
+    global_window.width = 1920;
+    global_window.height = 1080;
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    #else
     global_window.width = 960;
     global_window.height = 540;
     GLFWmonitor* monitor = NULL;
-    #ifndef DEBUG
-    monitor = glfwGetPrimaryMonitor();
     #endif
     global_window.handle = glfwCreateWindow(global_window.width,
                                             global_window.height,
