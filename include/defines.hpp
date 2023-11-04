@@ -2,6 +2,7 @@
 #define defines_hpp
 
 #include <stdint.h>
+#include <assert.h>
 
 #define DEBUG
 

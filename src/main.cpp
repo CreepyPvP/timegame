@@ -5,6 +5,7 @@
 
 #include "defines.hpp"
 #include "shader.hpp"
+#include "geometry_buffer.hpp"
 
 struct Window {
     int width;
@@ -68,10 +69,25 @@ int main()
         return 2;
     }
 
+    unsigned int gpu_buffers = setup_gpu_buffers();
+    GeometryBuffer draw_buffer;
+    draw_buffer.init();
+
+    GL(glClearColor(0.1, 0.1, 0.1, 1));
+
     while (!glfwWindowShouldClose(global_window.handle)) {
         if (glfwGetKey(global_window.handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(global_window.handle, true);
         }
+
+        GL(glClear(GL_COLOR_BUFFER_BIT));
+
+        draw_buffer.start_batch();
+        draw_buffer.draw_rect(100, 100, 100, 100);
+        draw_buffer.end_batch();
+
+        draw_buffer.update_gpu_buffers(gpu_buffers);
+        draw_buffer.reset();
 
         glfwSwapBuffers(global_window.handle);
         glfwPollEvents();
